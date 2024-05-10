@@ -1,0 +1,13 @@
+{
+  "setup": {
+    "city": "mae sai",
+    "delay": 5
+  },
+  "config": [
+    { "emoji": "🧡", "text": "TEXT 1" },
+    { "emoji": "💛", "text": "TEXT 2" },
+    { "emoji": "💚", "text": "TEXT 3" },
+    { "emoji": "💙", "text": "TEXT 4" },
+    { "emoji": "💜", "text": "TEXT 5" }
+  ]
+}
