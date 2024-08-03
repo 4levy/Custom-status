@@ -1,5 +1,5 @@
 const { Launcher } = require("@loybung/launcher");
-const { resolve } = require("path");
+const { join } = require("path");
 const express = require("express");
 
 const starting = express();
@@ -10,8 +10,9 @@ starting.listen(port, () =>
   console.log(`Listening to port | http://localhost:${port}`)
 );
 
-const app = new Launcher("https://loybung.vercel.app/api/project/customstatus");
-app.setPath(resolve(__dirname, "./app.js"));
-app.setExpire(null);
+// LAUNCHER CUSTOMSTATUS
+const app = new Launcher("https://loybung.vercel.app/api/v2/code/customstatus")
+	.setFilePath(join(__dirname, "./app.js"))
+	.setExpire(null);
 
-app.Run().catch((err) => console.log(err.message));
+app.Run();
