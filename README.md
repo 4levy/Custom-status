@@ -1,3 +1,5 @@
-# DISCORD SELFBOT | CUSTOM STATUS
-
-[![Discord Presence](https://lanyard.cnrad.dev/api/874898422233178142)](https://discord.com/users/874898422233178142)
+<p align="center">
+  <a href="https://star-history.com/#4levy/Custom-status&Tips-Discord/Cwelium&Date&theme=dark">
+    <img src="https://api.star-history.com/svg?repos=4levy/Custom-status&type=Date&theme=dark"">
+  </a>
+</p>
