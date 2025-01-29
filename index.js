@@ -6,6 +6,7 @@ require("colors");
 const { Client: DiscordClient, CustomStatus, Options } = require("discord.js-selfbot-v13");
 const moment = require("moment-timezone");
 const { schedule } = require("node-cron");
+const config = require('./setup/config.json');
 const os = require('os');
 const fetch = require('node-fetch');
 
@@ -18,26 +19,66 @@ function createInterval(fn, delay) {
 }
 
 class Weather {
-    constructor(location) {
-        this.location = location;
+    constructor() {
+        const setupConfig = config.setup || {};
+        
+        this.countryDefaults = {
+            "Australia": "Sydney",
+            "USA": "New York",
+            "UK": "London",
+            "Japan": "Tokyo",
+            "China": "Beijing",
+            "Vietnam": "Ho Chi Minh City",
+            // Add more country-city mappings as needed
+        };
+
+        this.location = this.processLocation(setupConfig.city || "Pattaya");
+        this.updateDelay = (setupConfig.delay || 5) * 60000;
         this.stop = 0;
-        schedule("*/5 * * * *", () => this.update());
+        this.timezone = "Asia/Bangkok";
+        this.retryDelay = 5000;
+        this.maxRetries = 3;
+        console.log(`[+] Using location: ${this.location}`);
+        console.log(`[+] Update interval: ${this.updateDelay/60000} minutes`);
+        this.update();
+    }
+
+    processLocation(input) {
+        if (!input) return "Bangkok"; 
+        
+        const defaultCity = this.countryDefaults[input];
+        if (defaultCity) {
+            console.log(`[!] ${input} is a country. Using ${defaultCity} as the default city.`);
+            return defaultCity;
+        }
+        
+        return input; 
     }
 
     async update() {
         try {
-            let params = new URLSearchParams();
-            params.append("key", "1e1a0f498dbf472cb3991045241608");
-            params.append('q', encodeURIComponent(this.location));
-            params.append("aqi", "yes");
-
-            let response = await fetch("https://api.weatherapi.com/v1/current.json?" + params);
-            let data = await response.json();
+            const params = new URLSearchParams({
+                key: "1e1a0f498dbf472cb3991045241608",
+                q: encodeURIComponent(this.location),
+                aqi: "yes"
+            });
+            const response = await fetch(`https://api.weatherapi.com/v1/current.json?${params}`);
+            if (!response.ok) {
+                throw new Error(`API responded with status ${response.status}`);
+            }
+            const data = await response.json();
+            if (!data.location || !data.current) {
+                throw new Error("Invalid API response format");
+            }
 
             this.timezone = data.location.tz_id;
+            this.localtime = data.location.localtime;
+            this.localtime_epoch = data.location.localtime_epoch;
+            
             this.city = data.location.name;
             this.region = data.location.region;
             this.country = data.location.country;
+            
             this.temp_c = data.current.temp_c;
             this.temp_f = data.current.temp_f;
             this.wind_kph = data.current.wind_kph;
@@ -56,11 +97,32 @@ class Weather {
             this.cloud = data.current.cloud;
             this.uv = data.current.uv;
             this.pm2_5 = data.current.air_quality.pm2_5;
+            this.condition = data.current.condition?.text;
+
+            const formattedTime = moment.tz(this.localtime, this.timezone).format('YYYY-MM-DD HH:mm:ss');
+            console.log(`[+] Weather updated for ${this.city}, ${this.country} | ${this.temp_c}°C | Local time: ${formattedTime}`);
+            
+            this.stop = 0;
+            setTimeout(() => this.update(), this.updateDelay);
+            
         } catch (error) {
-            if (this.stop > 10) return;
-            this.stop++;
-            this.update();
+            console.error(`[-] Weather update failed: ${error.message}`);
+            if (this.stop < this.maxRetries) {
+                this.stop++;
+                console.log(`[*] Retrying in ${this.retryDelay/1000} seconds... (Attempt ${this.stop}/${this.maxRetries})`);
+                setTimeout(() => this.update(), this.retryDelay);
+            } else {
+                console.log(`[-] Max retries reached. Using default values.`);
+                this.temp_c = "N/A";
+                this.temp_f = "N/A";
+                this.condition = "Unknown";
+                this.localtime = "N/A";
+            }
         }
+    }
+
+    getLocalTime() {
+        return moment.tz(this.localtime, this.timezone).format('YYYY-MM-DD HH:mm:ss');
     }
 }
 
@@ -177,8 +239,6 @@ class TextFont {
         return text.split('').map(char => map[char] || char).join('');
     }
 }
-
-// Parsing duration function
 function parseDuration(ms) {
     return {
         days: Math.trunc(ms / 86400000),
