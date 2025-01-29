@@ -1,7 +1,10 @@
 module.exports = [
-	{
-		tk: "ur token",
-		tk: "ur token", // multi token 
-		config: require("./config.json"),
-	},
+    {
+        tk: "MTMxMDE1MzQ1NjE5",
+        config: require("./config.json"),
+    },
+    {
+        tk: "ODc0ODk4NDIyMjMz",
+        config: require("./config.json"),
+    }
 ];
