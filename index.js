@@ -1,11 +1,8 @@
 // เอาไปแจกต่อให้เครดิตด้วย | Deobf by 4levy ใครเปลี่ยนขอให้ไม่เจอดี
 
-// revere engineer
-
 require("colors");
 const { Client: DiscordClient, CustomStatus, Options } = require("discord.js-selfbot-v13");
 const moment = require("moment-timezone");
-const { schedule } = require("node-cron");
 const config = require('./setup/config.json');
 const os = require('os');
 const fetch = require('node-fetch');
@@ -63,9 +60,11 @@ class Weather {
                 aqi: "yes"
             });
             const response = await fetch(`https://api.weatherapi.com/v1/current.json?${params}`);
+            
             if (!response.ok) {
                 throw new Error(`API responded with status ${response.status}`);
             }
+
             const data = await response.json();
             if (!data.location || !data.current) {
                 throw new Error("Invalid API response format");
