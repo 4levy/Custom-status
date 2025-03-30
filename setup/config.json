@@ -1,9 +1,10 @@
 {
 	"setup": {
-		"city": "Bangkok",
+		"city": "Australia",
 		"delay": 5
 	},
 	"config": [
+		{ "emoji": "", "text": "{NF3({emoji:time} › {hour:1}:{min:1} ⋆ {th=date} / {en=month:2} / {en=year:2})}" }
 		{ "emoji": "🧡", "text": "TEXT 1" },
 		{ "emoji": "💛", "text": "TEXT 2" },
 		{ "emoji": "💚", "text": "TEXT 3" },
