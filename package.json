@@ -1,0 +1,17 @@
+{
+  "name": "custom-status",
+  "version": "0.0.2",
+  "description": "AAAA",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "4levy",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "discord.js-selfbot-v13": "^3.6.1",
+    "moment-timezone": "^0.5.48",
+    "node-fetch": "^2.7.0",
+    "os": "^0.1.2"
+  }
+}
